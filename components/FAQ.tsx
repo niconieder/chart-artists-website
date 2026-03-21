@@ -14,11 +14,6 @@ const faqs = [
       "No. Basic ICT concepts are available for free on YouTube. I focus on what comes after — building a real system, refining your edge, and developing the mindset to execute consistently.",
   },
 {
-    question: "Why $40/month and not free?",
-    answer:
-      "Free communities attract noise. A small subscription filters for people who are serious. It also keeps the space sustainable — meaning consistent content and a maintained community long-term.",
-  },
-  {
     question: "Do you give signals?",
     answer:
       "No. The goal is to teach you to read the market yourself. Signals create dependency — the opposite of what I stand for.",
