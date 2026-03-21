@@ -87,8 +87,8 @@ function TestimonialCard({ quote, name }: { quote: string; name: string }) {
 
 export default function Testimonials() {
   return (
-    <section id="testimonials" className="border-t border-white/10 py-24 px-6">
-      <div className="mx-auto max-w-6xl mb-16">
+    <section id="testimonials" className="border-t border-white/10 py-24">
+      <div className="mx-auto max-w-6xl mb-16 px-6">
         <p className="text-white/30 text-xs tracking-[0.2em] uppercase mb-4">
           Members
         </p>
@@ -98,7 +98,7 @@ export default function Testimonials() {
       </div>
 
       <div className="overflow-hidden">
-        <div className="testimonial-track">
+        <div className="testimonial-track pl-6">
           <div className="flex gap-4 pr-4">
             {testimonials.map(({ quote, name }, i) => (
               <TestimonialCard key={`a-${i}`} quote={quote} name={name} />
