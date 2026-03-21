@@ -1,17 +1,17 @@
 export default function Hero() {
   return (
     <section className="relative hero-bg min-h-screen flex flex-col items-center justify-center px-6 pt-24 pb-20 text-center overflow-hidden">
-      {/* Multi-colour gradient orbs */}
+      {/* Multi-colour gradient orbs — hidden on mobile for scroll performance */}
       <div
-        className="absolute top-1/3 left-[30%] -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] rounded-full blur-[130px] pointer-events-none"
+        className="hidden sm:block absolute top-1/3 left-[30%] -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] rounded-full blur-[130px] pointer-events-none"
         style={{ background: "rgba(61, 140, 122, 0.13)" }}
       />
       <div
-        className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[400px] h-[250px] rounded-full blur-[130px] pointer-events-none"
+        className="hidden sm:block absolute top-[20%] left-1/2 -translate-x-1/2 w-[400px] h-[250px] rounded-full blur-[130px] pointer-events-none"
         style={{ background: "rgba(196, 168, 74, 0.08)" }}
       />
       <div
-        className="absolute top-1/3 left-[65%] -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] rounded-full blur-[130px] pointer-events-none"
+        className="hidden sm:block absolute top-1/3 left-[65%] -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] rounded-full blur-[130px] pointer-events-none"
         style={{ background: "rgba(125, 158, 130, 0.12)" }}
       />
 

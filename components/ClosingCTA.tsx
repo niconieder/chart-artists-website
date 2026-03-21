@@ -1,17 +1,17 @@
 export default function ClosingCTA() {
   return (
     <section className="border-t border-white/10 py-32 px-6 relative overflow-hidden">
-      {/* Multi-colour gradient orbs */}
+      {/* Multi-colour gradient orbs — hidden on mobile for scroll performance */}
       <div
-        className="absolute top-1/2 left-[30%] -translate-x-1/2 -translate-y-1/2 w-[500px] h-[280px] rounded-full blur-[120px] pointer-events-none"
+        className="hidden sm:block absolute top-1/2 left-[30%] -translate-x-1/2 -translate-y-1/2 w-[500px] h-[280px] rounded-full blur-[120px] pointer-events-none"
         style={{ background: "rgba(61, 140, 122, 0.12)" }}
       />
       <div
-        className="absolute top-[30%] left-1/2 -translate-x-1/2 w-[380px] h-[220px] rounded-full blur-[120px] pointer-events-none"
+        className="hidden sm:block absolute top-[30%] left-1/2 -translate-x-1/2 w-[380px] h-[220px] rounded-full blur-[120px] pointer-events-none"
         style={{ background: "rgba(196, 168, 74, 0.07)" }}
       />
       <div
-        className="absolute top-1/2 left-[65%] -translate-x-1/2 -translate-y-1/2 w-[500px] h-[280px] rounded-full blur-[120px] pointer-events-none"
+        className="hidden sm:block absolute top-1/2 left-[65%] -translate-x-1/2 -translate-y-1/2 w-[500px] h-[280px] rounded-full blur-[120px] pointer-events-none"
         style={{ background: "rgba(125, 158, 130, 0.10)" }}
       />
 
