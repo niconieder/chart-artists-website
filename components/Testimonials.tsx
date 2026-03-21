@@ -1,3 +1,7 @@
+"use client";
+
+import { useRef, useState } from "react";
+
 const testimonials = [
   {
     quote:
@@ -86,6 +90,38 @@ function TestimonialCard({ quote, name }: { quote: string; name: string }) {
 }
 
 export default function Testimonials() {
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollOffset, setScrollOffset] = useState(0);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setIsDragging(true);
+    setStartX(e.touches[0].clientX);
+    const track = trackRef.current;
+    if (track) {
+      const transform = getComputedStyle(track).transform;
+      const matrix = new DOMMatrix(transform);
+      setScrollOffset(matrix.m41);
+      track.style.animationPlayState = "paused";
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging || !trackRef.current) return;
+    const diff = e.touches[0].clientX - startX;
+    trackRef.current.style.transform = `translateX(${scrollOffset + diff}px)`;
+  };
+
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+    const track = trackRef.current;
+    if (track) {
+      track.style.transform = "";
+      track.style.animationPlayState = "running";
+    }
+  };
+
   return (
     <section id="testimonials" className="border-t border-white/10 py-24">
       <div className="mx-auto max-w-6xl mb-16 px-6">
@@ -98,7 +134,13 @@ export default function Testimonials() {
       </div>
 
       <div className="overflow-hidden">
-        <div className="testimonial-track pl-6">
+        <div
+          ref={trackRef}
+          className="testimonial-track pl-6"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
           <div className="flex gap-4 pr-4">
             {testimonials.map(({ quote, name }, i) => (
               <TestimonialCard key={`a-${i}`} quote={quote} name={name} />
