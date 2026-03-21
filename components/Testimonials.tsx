@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 const testimonials = [
   {
@@ -72,7 +72,7 @@ const testimonials = [
 
 function TestimonialCard({ quote, name }: { quote: string; name: string }) {
   return (
-    <div className="glass-card rounded-xl p-8 relative shrink-0 w-[85vw] sm:w-[340px] whitespace-normal transition-all duration-300 hover:border-[#7D9E82]/20 hover:shadow-[0_0_30px_rgba(125,158,130,0.08)]">
+    <div className="glass-card rounded-xl p-8 relative shrink-0 w-[85vw] sm:w-[340px] whitespace-normal snap-start transition-all duration-300 hover:border-[#7D9E82]/20 hover:shadow-[0_0_30px_rgba(125,158,130,0.08)]">
       <span
         className="absolute top-4 right-6 text-8xl leading-none select-none pointer-events-none opacity-5"
         style={{ color: "#7D9E82" }}
@@ -90,37 +90,14 @@ function TestimonialCard({ quote, name }: { quote: string; name: string }) {
 }
 
 export default function Testimonials() {
-  const trackRef = useRef<HTMLDivElement>(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const [startX, setStartX] = useState(0);
-  const [scrollOffset, setScrollOffset] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setIsDragging(true);
-    setStartX(e.touches[0].clientX);
-    const track = trackRef.current;
-    if (track) {
-      const transform = getComputedStyle(track).transform;
-      const matrix = new DOMMatrix(transform);
-      setScrollOffset(matrix.m41);
-      track.style.animationPlayState = "paused";
-    }
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isDragging || !trackRef.current) return;
-    const diff = e.touches[0].clientX - startX;
-    trackRef.current.style.transform = `translateX(${scrollOffset + diff}px)`;
-  };
-
-  const handleTouchEnd = () => {
-    setIsDragging(false);
-    const track = trackRef.current;
-    if (track) {
-      track.style.transform = "";
-      track.style.animationPlayState = "running";
-    }
-  };
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 640);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
   return (
     <section id="testimonials" className="border-t border-white/10 py-24">
@@ -133,26 +110,30 @@ export default function Testimonials() {
         </h2>
       </div>
 
-      <div className="overflow-hidden">
-        <div
-          ref={trackRef}
-          className="testimonial-track pl-6"
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-        >
-          <div className="flex gap-4 pr-4">
+      {isMobile ? (
+        <div className="overflow-x-auto snap-x snap-mandatory scrollbar-hide px-6">
+          <div className="flex gap-4 w-max">
             {testimonials.map(({ quote, name }, i) => (
-              <TestimonialCard key={`a-${i}`} quote={quote} name={name} />
-            ))}
-          </div>
-          <div className="flex gap-4 pr-4" aria-hidden>
-            {testimonials.map(({ quote, name }, i) => (
-              <TestimonialCard key={`b-${i}`} quote={quote} name={name} />
+              <TestimonialCard key={i} quote={quote} name={name} />
             ))}
           </div>
         </div>
-      </div>
+      ) : (
+        <div className="overflow-hidden">
+          <div className="testimonial-track pl-6">
+            <div className="flex gap-4 pr-4">
+              {testimonials.map(({ quote, name }, i) => (
+                <TestimonialCard key={`a-${i}`} quote={quote} name={name} />
+              ))}
+            </div>
+            <div className="flex gap-4 pr-4" aria-hidden>
+              {testimonials.map(({ quote, name }, i) => (
+                <TestimonialCard key={`b-${i}`} quote={quote} name={name} />
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

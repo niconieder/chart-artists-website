@@ -100,3 +100,12 @@ html {
 .testimonial-track:hover {
   animation-play-state: paused;
 }
+
+/* Hide scrollbar for mobile swipe */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
