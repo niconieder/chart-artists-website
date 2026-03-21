@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Manrope, Instrument_Serif } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
@@ -46,6 +47,7 @@ export default function RootLayout({
     >
       <body className="bg-black text-white antialiased">
         {children}
+        <Analytics />
         <SpeedInsights />
       </body>
     </html>
