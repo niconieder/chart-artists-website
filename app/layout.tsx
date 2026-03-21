@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Manrope, Instrument_Serif } from "next/font/google";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -43,7 +44,10 @@ export default function RootLayout({
       className={`${manrope.variable} ${instrumentSerif.variable}`}
       suppressHydrationWarning
     >
-      <body className="bg-black text-white antialiased">{children}</body>
+      <body className="bg-black text-white antialiased">
+        {children}
+        <SpeedInsights />
+      </body>
     </html>
   );
 }
