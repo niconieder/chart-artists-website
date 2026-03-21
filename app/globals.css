@@ -92,7 +92,7 @@ html {
 }
 
 .testimonial-track {
-  animation: testimonial-scroll 30s linear infinite;
+  animation: testimonial-scroll 15s linear infinite;
   white-space: nowrap;
   display: flex;
 }
