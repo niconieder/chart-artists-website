@@ -1,5 +1,3 @@
-"use client";
-
 const plans = [
   {
     name: "Monthly",
@@ -92,28 +90,22 @@ export default function Pricing() {
                 href={href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full text-center py-3.5 text-sm font-semibold tracking-wide uppercase transition-all duration-200"
+                className={`pricing-cta w-full text-center py-3.5 text-sm font-semibold tracking-wide uppercase transition-all duration-200 ${
+                  featured ? "pricing-cta-featured" : "pricing-cta-outline"
+                }`}
                 style={
                   featured
-                    ? { background: accentColor, color: "#000" }
+                    ? {
+                        background: accentColor,
+                        color: "#000",
+                        "--pricing-hover-shadow": `0 0 30px ${accentColor}50`,
+                      } as React.CSSProperties
                     : {
                         border: `1px solid ${accentColor}50`,
                         color: accentColor,
-                      }
+                        "--pricing-hover-background": `${accentColor}15`,
+                      } as React.CSSProperties
                 }
-                onMouseEnter={(e) => {
-                  const el = e.currentTarget as HTMLAnchorElement;
-                  if (featured) {
-                    el.style.boxShadow = `0 0 30px ${accentColor}50`;
-                  } else {
-                    el.style.background = `${accentColor}15`;
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  const el = e.currentTarget as HTMLAnchorElement;
-                  el.style.boxShadow = "none";
-                  if (!featured) el.style.background = "transparent";
-                }}
               >
                 {cta}
               </a>

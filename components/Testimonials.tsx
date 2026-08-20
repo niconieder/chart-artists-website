@@ -1,7 +1,3 @@
-"use client";
-
-import { useEffect, useState } from "react";
-
 const testimonials = [
   {
     quote:
@@ -90,15 +86,6 @@ function TestimonialCard({ quote, name }: { quote: string; name: string }) {
 }
 
 export default function Testimonials() {
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 640);
-    check();
-    window.addEventListener("resize", check);
-    return () => window.removeEventListener("resize", check);
-  }, []);
-
   return (
     <section id="testimonials" className="border-t border-white/10 py-24">
       <div className="mx-auto max-w-6xl mb-16 px-6">
@@ -110,30 +97,20 @@ export default function Testimonials() {
         </h2>
       </div>
 
-      {isMobile ? (
-        <div className="overflow-x-auto snap-x snap-mandatory scrollbar-hide px-6">
-          <div className="flex gap-4 w-max">
+      <div className="overflow-x-auto sm:overflow-hidden snap-x snap-mandatory sm:snap-none scrollbar-hide px-6 sm:px-0">
+        <div className="testimonial-track">
+          <div className="flex gap-4 sm:pr-4">
             {testimonials.map(({ quote, name }, i) => (
               <TestimonialCard key={i} quote={quote} name={name} />
             ))}
           </div>
-        </div>
-      ) : (
-        <div className="overflow-hidden">
-          <div className="testimonial-track pl-6">
-            <div className="flex gap-4 pr-4">
-              {testimonials.map(({ quote, name }, i) => (
-                <TestimonialCard key={`a-${i}`} quote={quote} name={name} />
-              ))}
-            </div>
-            <div className="flex gap-4 pr-4" aria-hidden>
-              {testimonials.map(({ quote, name }, i) => (
-                <TestimonialCard key={`b-${i}`} quote={quote} name={name} />
-              ))}
-            </div>
+          <div className="hidden sm:flex gap-4 pr-4" aria-hidden>
+            {testimonials.map(({ quote, name }, i) => (
+              <TestimonialCard key={`duplicate-${i}`} quote={quote} name={name} />
+            ))}
           </div>
         </div>
-      )}
+      </div>
     </section>
   );
 }

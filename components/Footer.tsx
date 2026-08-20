@@ -7,7 +7,7 @@ export default function Footer() {
         {/* Brand */}
         <div className="flex items-center gap-3">
           <Image
-            src="/logo.png"
+            src="/logo.jpg"
             alt="Chart Artists"
             width={28}
             height={28}

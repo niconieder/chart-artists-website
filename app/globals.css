@@ -108,13 +108,28 @@ html {
 }
 
 .testimonial-track {
-  animation: testimonial-scroll 15s linear infinite;
   white-space: nowrap;
   display: flex;
+  width: max-content;
 }
 
-.testimonial-track:hover {
-  animation-play-state: paused;
+@media (min-width: 640px) {
+  .testimonial-track {
+    animation: testimonial-scroll 15s linear infinite;
+    padding-left: 1.5rem;
+  }
+
+  .testimonial-track:hover {
+    animation-play-state: paused;
+  }
+}
+
+.pricing-cta-featured:hover {
+  box-shadow: var(--pricing-hover-shadow);
+}
+
+.pricing-cta-outline:hover {
+  background: var(--pricing-hover-background);
 }
 
 /* Hide scrollbar for mobile swipe */

@@ -22,7 +22,6 @@ export default function ClosingCTA() {
       >
         <span
           className="text-[8rem] sm:text-[12rem] font-bold tracking-tighter whitespace-nowrap opacity-[0.03] text-gradient"
-          style={{ fontFamily: "var(--font-serif)" }}
         >
           CHART ARTISTS
         </span>
