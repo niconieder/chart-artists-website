@@ -10,9 +10,9 @@ export const metadata: Metadata = {
 const tools = [
   {
     name: "Risk Calculator",
-    description: "Calculate a position size once across all your trading accounts.",
+    description: "Calculate Forex lots or Futures contracts once across all your trading accounts.",
     href: "/risk-calculator",
-    label: "Forex",
+    label: "Forex · Futures",
   },
 ];
 

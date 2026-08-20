@@ -4,8 +4,8 @@ import Footer from "@/components/Footer";
 import RiskCalculator from "@/components/RiskCalculator";
 
 export const metadata: Metadata = {
-  title: "Forex Risk Calculator | The Chart Artists",
-  description: "Calculate forex and metals position sizes for one or multiple trading accounts.",
+  title: "Forex & Futures Risk Calculator | The Chart Artists",
+  description: "Calculate forex lot sizes and CME futures contracts for one or multiple trading accounts.",
 };
 
 export default function RiskCalculatorPage() {
@@ -19,4 +19,3 @@ export default function RiskCalculatorPage() {
     </>
   );
 }
-
