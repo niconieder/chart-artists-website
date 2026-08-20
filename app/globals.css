@@ -26,6 +26,17 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Keep native calculator dropdowns readable in the dark interface. */
+.calculator-select {
+  color-scheme: dark;
+}
+
+.calculator-select option,
+.calculator-select optgroup {
+  background: #111412;
+  color: #ffffff;
+}
+
 /* Gradient text — white → sage → teal */
 .text-gradient {
   background: linear-gradient(135deg, #ffffff 40%, #A3BFA8 70%, #7D9E82 100%);
