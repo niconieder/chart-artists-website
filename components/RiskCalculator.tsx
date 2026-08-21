@@ -15,19 +15,20 @@ import {
 } from "@/lib/futures-calculator";
 
 type Market = "forex" | "futures";
+type EditableNumber = number | "";
 
 type TradingAccount = {
   id: string;
   name: string;
-  balance: number;
+  balance: EditableNumber;
   currency: AccountCurrency;
-  riskPercent: number;
+  riskPercent: EditableNumber;
 };
 
 type QuickAccount = {
-  accountSize: number;
+  accountSize: EditableNumber;
   accountCurrency: AccountCurrency;
-  riskValue: number;
+  riskValue: EditableNumber;
   riskMode: "percent" | "amount";
 };
 
@@ -73,6 +74,23 @@ function normalizeStoredAccounts(value: unknown, market: Market) {
 function numberValue(value: string) {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function editableNumberValue(value: string): EditableNumber {
+  return value === "" ? "" : numberValue(value);
+}
+
+function calculationNumber(value: EditableNumber) {
+  return value === "" ? 0 : value;
+}
+
+function formattedInteger(value: EditableNumber) {
+  return value === "" ? "" : new Intl.NumberFormat("de-DE", { maximumFractionDigits: 0 }).format(value);
+}
+
+function groupedIntegerValue(value: string): EditableNumber {
+  const digits = value.replace(/\D/g, "");
+  return digits === "" ? "" : Number(digits);
 }
 
 function optionalNumberValue(value: string) {
@@ -203,9 +221,10 @@ function FuturesPicker({ value, onChange }: { value: string; onChange: (value: s
 export default function RiskCalculator() {
   const [market, setMarket] = useState<Market>("forex");
   const [pair, setPair] = useState("EUR/USD");
-  const [stopLoss, setStopLoss] = useState(50);
+  const [stopLoss, setStopLoss] = useState<EditableNumber>(50);
   const [futuresSymbol, setFuturesSymbol] = useState("NQ");
-  const [futuresStopLoss, setFuturesStopLoss] = useState(40);
+  const [futuresStopLossTicks, setFuturesStopLossTicks] = useState<EditableNumber>(40);
+  const [futuresStopUnit, setFuturesStopUnit] = useState<"ticks" | "points">("ticks");
   const [futuresEntryPrice, setFuturesEntryPrice] = useState("");
   const [futuresStopPrice, setFuturesStopPrice] = useState("");
   const [quickAccounts, setQuickAccounts] = useState<Record<Market, QuickAccount>>(defaultQuickAccounts);
@@ -236,9 +255,19 @@ export default function RiskCalculator() {
     rawPriceTicks !== null && Math.abs(rawPriceTicks - roundedPriceTicks) < 0.000001
       ? roundedPriceTicks
       : null;
+  const manualFuturesStopDisplay = futuresStopLossTicks === ""
+    ? ""
+    : futuresStopUnit === "ticks"
+      ? futuresStopLossTicks
+      : Number((futuresStopLossTicks * futuresInstrument.tickSize).toFixed(8));
+  const derivedFuturesStopDisplay = derivedStopLossTicks === null
+    ? ""
+    : futuresStopUnit === "ticks"
+      ? derivedStopLossTicks
+      : Number((derivedStopLossTicks * futuresInstrument.tickSize).toFixed(8));
   const effectiveFuturesStopLoss = priceInputsComplete
     ? derivedStopLossTicks ?? 0
-    : futuresStopLoss;
+    : calculationNumber(futuresStopLossTicks);
 
   useEffect(() => {
     try {
@@ -285,23 +314,23 @@ export default function RiskCalculator() {
   const singleResult = useMemo(() => calculatePosition({
     instrument,
     accountCurrency,
-    accountSize,
-    stopLossPips: stopLoss,
-    riskValue,
+    accountSize: calculationNumber(accountSize),
+    stopLossPips: calculationNumber(stopLoss),
+    riskValue: calculationNumber(riskValue),
     riskMode,
     usdRates: rates,
   }), [instrument, accountCurrency, accountSize, stopLoss, riskValue, riskMode, rates]);
   const singleRoundedLots = roundedLots(singleResult.lots);
   const singleForexActualRisk = singleRoundedLots === null || singleResult.pipValuePerLot === null
     ? null
-    : singleRoundedLots * stopLoss * singleResult.pipValuePerLot;
+    : singleRoundedLots * calculationNumber(stopLoss) * singleResult.pipValuePerLot;
 
   const singleFuturesResult = useMemo(() => calculateFuturesPosition({
     instrument: futuresInstrument,
     accountCurrency,
-    accountSize,
+    accountSize: calculationNumber(accountSize),
     stopLossTicks: effectiveFuturesStopLoss,
-    riskValue,
+    riskValue: calculationNumber(riskValue),
     riskMode,
     usdRates: rates,
   }), [futuresInstrument, accountCurrency, accountSize, effectiveFuturesStopLoss, riskValue, riskMode, rates]);
@@ -392,12 +421,12 @@ export default function RiskCalculator() {
               </label>
               <label>
                 <FieldLabel>Stop loss (pips)</FieldLabel>
-                <input aria-label="Stop loss in pips" className={inputClass} type="number" min="0.1" step="0.1" value={stopLoss} onChange={(event) => setStopLoss(numberValue(event.target.value))} />
+                <input aria-label="Stop loss in pips" className={inputClass} type="number" min="0.1" step="0.1" value={stopLoss} onChange={(event) => setStopLoss(editableNumberValue(event.target.value))} />
               </label>
             </div>
           ) : (
             <>
-              <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-[1fr_120px_120px_120px]">
+              <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-[1fr_120px_120px_200px]">
                 <label>
                   <FieldLabel>CME contract</FieldLabel>
                   <FuturesPicker value={futuresSymbol} onChange={setFuturesSymbol} />
@@ -410,20 +439,29 @@ export default function RiskCalculator() {
                   <FieldLabel>Stop price</FieldLabel>
                   <input aria-label="Futures stop price" className={inputClass} type="number" min="0" step={futuresInstrument.tickSize} placeholder="Optional" value={futuresStopPrice} onChange={(event) => setFuturesStopPrice(event.target.value)} />
                 </label>
-                <label>
-                  <FieldLabel>Stop (ticks)</FieldLabel>
-                  <input
-                    aria-label="Stop loss in ticks"
-                    className={`${inputClass} read-only:cursor-default read-only:text-sage-light`}
-                    type="number"
-                    min="1"
-                    step="1"
-                    readOnly={priceInputsComplete}
-                    title={priceInputsComplete ? "Calculated from entry and stop prices" : "Enter the stop distance manually"}
-                    value={priceInputsComplete ? derivedStopLossTicks ?? "" : futuresStopLoss}
-                    onChange={(event) => setFuturesStopLoss(numberValue(event.target.value))}
-                  />
-                </label>
+                <div>
+                  <FieldLabel>Stop distance</FieldLabel>
+                  <div className="grid grid-cols-[1fr_78px] gap-1.5">
+                    <input
+                      aria-label={`Stop loss in ${futuresStopUnit}`}
+                      className={`${inputClass} read-only:cursor-default read-only:text-sage-light`}
+                      type="number"
+                      min={futuresStopUnit === "ticks" ? 1 : futuresInstrument.tickSize}
+                      step={futuresStopUnit === "ticks" ? 1 : futuresInstrument.tickSize}
+                      readOnly={priceInputsComplete}
+                      title={priceInputsComplete ? "Calculated from entry and stop prices" : "Enter the stop distance manually"}
+                      value={priceInputsComplete ? derivedFuturesStopDisplay : manualFuturesStopDisplay}
+                      onChange={(event) => {
+                        const next = editableNumberValue(event.target.value);
+                        setFuturesStopLossTicks(next === "" || futuresStopUnit === "ticks" ? next : next / futuresInstrument.tickSize);
+                      }}
+                    />
+                    <select aria-label="Stop loss unit" className={`${inputClass} calculator-select px-2`} value={futuresStopUnit} onChange={(event) => setFuturesStopUnit(event.target.value as "ticks" | "points")}>
+                      <option value="ticks">Ticks</option>
+                      <option value="points">Points</option>
+                    </select>
+                  </div>
+                </div>
               </div>
               <div className="mt-2.5 border-t border-white/8 pt-2.5 text-[9px] text-white/35">
                 {priceInputsComplete && (
@@ -457,14 +495,14 @@ export default function RiskCalculator() {
 
             <div className="space-y-2.5">
               <div className="grid grid-cols-[1fr_82px] gap-2">
-                <label><FieldLabel>Account size</FieldLabel><input aria-label="Account size" className={inputClass} type="number" min="0" value={accountSize} onChange={(event) => updateQuickAccount({ accountSize: numberValue(event.target.value) })} /></label>
+                <label><FieldLabel>Account size</FieldLabel><input aria-label="Account size" className={inputClass} type="text" inputMode="numeric" value={formattedInteger(accountSize)} onChange={(event) => updateQuickAccount({ accountSize: groupedIntegerValue(event.target.value) })} /></label>
                 <label><FieldLabel>Currency</FieldLabel><select aria-label="Account currency" className={`${inputClass} calculator-select`} value={accountCurrency} onChange={(event) => updateQuickAccount({ accountCurrency: event.target.value as AccountCurrency })}>{ACCOUNT_CURRENCIES.map((currency) => <option key={currency}>{currency}</option>)}</select></label>
               </div>
 
               <div>
                 <FieldLabel>Risk</FieldLabel>
                 <div className="grid grid-cols-[1fr_auto] gap-3">
-                  <input aria-label="Risk" className={inputClass} type="number" min="0" step="0.1" value={riskValue} onChange={(event) => updateQuickAccount({ riskValue: numberValue(event.target.value) })} />
+                  <input aria-label="Risk" className={inputClass} type="number" min="0" step="0.1" value={riskValue} onChange={(event) => updateQuickAccount({ riskValue: editableNumberValue(event.target.value) })} />
                   <div className="flex rounded-lg border border-white/10 bg-white/[0.055] p-0.5">
                     <button onClick={() => updateQuickAccount({ riskMode: "percent" })} className={`min-w-10 rounded-md px-2 text-xs transition ${riskMode === "percent" ? "bg-white text-black" : "text-white/45 hover:text-white"}`}>%</button>
                     <button onClick={() => updateQuickAccount({ riskMode: "amount" })} className={`min-w-10 rounded-md px-2 text-xs transition ${riskMode === "amount" ? "bg-white text-black" : "text-white/45 hover:text-white"}`}>{currencySymbols[accountCurrency]}</button>
@@ -512,10 +550,10 @@ export default function RiskCalculator() {
 
             <div className="space-y-2">
               {accounts.map((account) => {
-                const forexResult = calculatePosition({ instrument, accountCurrency: account.currency, accountSize: account.balance, stopLossPips: stopLoss, riskValue: account.riskPercent, riskMode: "percent", usdRates: rates });
+                const forexResult = calculatePosition({ instrument, accountCurrency: account.currency, accountSize: calculationNumber(account.balance), stopLossPips: calculationNumber(stopLoss), riskValue: calculationNumber(account.riskPercent), riskMode: "percent", usdRates: rates });
                 const accountLots = roundedLots(forexResult.lots);
-                const forexActualRisk = accountLots === null || forexResult.pipValuePerLot === null ? null : accountLots * stopLoss * forexResult.pipValuePerLot;
-                const futuresResult = calculateFuturesPosition({ instrument: futuresInstrument, accountCurrency: account.currency, accountSize: account.balance, stopLossTicks: effectiveFuturesStopLoss, riskValue: account.riskPercent, riskMode: "percent", usdRates: rates });
+                const forexActualRisk = accountLots === null || forexResult.pipValuePerLot === null ? null : accountLots * calculationNumber(stopLoss) * forexResult.pipValuePerLot;
+                const futuresResult = calculateFuturesPosition({ instrument: futuresInstrument, accountCurrency: account.currency, accountSize: calculationNumber(account.balance), stopLossTicks: effectiveFuturesStopLoss, riskValue: calculationNumber(account.riskPercent), riskMode: "percent", usdRates: rates });
                 const positionSize = market === "forex" ? accountLots : futuresResult.contracts;
                 const actualRisk = market === "forex" ? forexActualRisk : futuresResult.actualRisk;
                 return (
@@ -529,9 +567,9 @@ export default function RiskCalculator() {
                       {accounts.length > 1 && <button aria-label={`Remove ${account.name}`} onClick={() => removeAccount(market, account.id)} className="ml-1 text-lg text-white/25 transition hover:text-red-300">×</button>}
                     </div>
                     <div className="grid grid-cols-[1fr_76px_70px] gap-1.5">
-                      <input aria-label={`${account.name} balance`} className={`${inputClass} px-3`} type="number" min="0" value={account.balance} onChange={(event) => updateAccount(market, account.id, { balance: numberValue(event.target.value) })} />
+                      <input aria-label={`${account.name} balance`} className={`${inputClass} px-3`} type="text" inputMode="numeric" value={formattedInteger(account.balance)} onChange={(event) => updateAccount(market, account.id, { balance: groupedIntegerValue(event.target.value) })} />
                       <select aria-label={`${account.name} currency`} className={`${inputClass} calculator-select px-2`} value={account.currency} onChange={(event) => updateAccount(market, account.id, { currency: event.target.value as AccountCurrency })}>{ACCOUNT_CURRENCIES.map((currency) => <option key={currency}>{currency}</option>)}</select>
-                      <div className="relative"><input aria-label={`${account.name} risk percent`} className={`${inputClass} px-3 pr-6`} type="number" min="0" step="0.1" value={account.riskPercent} onChange={(event) => updateAccount(market, account.id, { riskPercent: numberValue(event.target.value) })} /><span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] text-white/35">%</span></div>
+                      <div className="relative"><input aria-label={`${account.name} risk percent`} className={`${inputClass} px-3 pr-6`} type="number" min="0" step="0.1" value={account.riskPercent} onChange={(event) => updateAccount(market, account.id, { riskPercent: editableNumberValue(event.target.value) })} /><span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] text-white/35">%</span></div>
                     </div>
                     <div className="mt-2 flex justify-end text-[9px] text-white/35">
                       <span>Actual risk: {actualRisk === null ? "—" : formatMoney(actualRisk, account.currency)}</span>
