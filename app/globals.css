@@ -124,6 +124,25 @@ html {
   }
 }
 
+/* Respect "reduce motion": stop the marquee and let users swipe/scroll instead */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .testimonial-track {
+    animation: none !important;
+  }
+
+  .testimonial-scroller {
+    overflow-x: auto !important;
+  }
+
+  .testimonial-duplicate {
+    display: none !important;
+  }
+}
+
 .pricing-cta-featured:hover {
   box-shadow: var(--pricing-hover-shadow);
 }

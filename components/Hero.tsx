@@ -30,7 +30,7 @@ export default function Hero() {
             className="relative flex h-1.5 w-1.5"
           >
             <span
-              className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-60"
+              className="animate-ping motion-reduce:animate-none absolute inline-flex h-full w-full rounded-full opacity-60"
               style={{ background: "#7D9E82" }}
             />
             <span

@@ -97,14 +97,14 @@ export default function Testimonials() {
         </h2>
       </div>
 
-      <div className="overflow-x-auto sm:overflow-hidden snap-x snap-mandatory sm:snap-none scrollbar-hide px-6 sm:px-0">
+      <div className="testimonial-scroller overflow-x-auto sm:overflow-hidden snap-x snap-mandatory sm:snap-none scrollbar-hide px-6 sm:px-0">
         <div className="testimonial-track">
           <div className="flex gap-4 sm:pr-4">
             {testimonials.map(({ quote, name }, i) => (
               <TestimonialCard key={i} quote={quote} name={name} />
             ))}
           </div>
-          <div className="hidden sm:flex gap-4 pr-4" aria-hidden>
+          <div className="testimonial-duplicate hidden sm:flex gap-4 pr-4" aria-hidden>
             {testimonials.map(({ quote, name }, i) => (
               <TestimonialCard key={`duplicate-${i}`} quote={quote} name={name} />
             ))}
