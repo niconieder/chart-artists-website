@@ -107,8 +107,26 @@ function formatMoney(value: number, currency: AccountCurrency) {
   }).format(value);
 }
 
+// Round down to the 0.01 lot step so the position never risks more than the target.
+// The small epsilon keeps exact values (e.g. 0.29999999 from float math) from dropping a step.
 function roundedLots(lots: number | null) {
-  return lots === null ? null : Math.round(lots * 100) / 100;
+  return lots === null ? null : Math.floor(lots * 100 + 1e-9) / 100;
+}
+
+type RatesMeta = {
+  provider: string;
+  isIntraday: boolean;
+  asOf: string;
+};
+
+function ratesLabel(meta: RatesMeta | null, failed: boolean) {
+  if (failed) return "Exchange rates unavailable — non-USD conversions can't be calculated right now.";
+  if (!meta) return "Loading exchange rates…";
+  if (meta.isIntraday) {
+    const time = new Date(meta.asOf).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    return `Live mid-market rates (${meta.provider}) · updated ${time}`;
+  }
+  return `${meta.provider} reference rates from ${meta.asOf} · may differ slightly from your broker`;
 }
 
 function FieldLabel({ children }: { children: React.ReactNode }) {
@@ -233,6 +251,8 @@ export default function RiskCalculator() {
     futures: [defaultFuturesAccount],
   });
   const [rates, setRates] = useState<Rates>({ USD: 1 });
+  const [ratesMeta, setRatesMeta] = useState<RatesMeta | null>(null);
+  const [ratesFailed, setRatesFailed] = useState(false);
   const [hydrated, setHydrated] = useState(false);
   const [copied, setCopied] = useState(false);
 
@@ -306,8 +326,11 @@ export default function RiskCalculator() {
       })
       .then((data) => {
         setRates(data.rates);
+        setRatesMeta({ provider: data.provider, isIntraday: Boolean(data.isIntraday), asOf: data.asOf ?? data.date });
       })
-      .catch(() => undefined);
+      .catch((error) => {
+        if (error?.name !== "AbortError") setRatesFailed(true);
+      });
     return () => controller.abort();
   }, []);
 
@@ -531,10 +554,19 @@ export default function RiskCalculator() {
               <div className="mt-2.5 border-t border-white/10 pt-2.5 text-[10px] text-white/40">
                 <div className="flex flex-wrap justify-between gap-2">
                   <span>Actual risk: {singleActualRisk === null ? "—" : formatMoney(singleActualRisk, accountCurrency)}</span>
+                  {market === "forex" && singleResult.pipValuePerLot !== null && (
+                    <span>Pip value: {formatMoney(singleResult.pipValuePerLot, accountCurrency)} / lot</span>
+                  )}
                   {market === "futures" && singleFuturesResult.riskPerContract !== null && (
                     <span>Per contract: {formatMoney(singleFuturesResult.riskPerContract, accountCurrency)}</span>
                   )}
                 </div>
+                {market === "forex" && singleResult.lots !== null && singleRoundedLots === 0 && (
+                  <p className="mt-1.5 text-amber-200/70">Below the 0.01 lot minimum — lower the stop or raise the risk.</p>
+                )}
+                {market === "futures" && singleFuturesResult.contracts === 0 && (
+                  <p className="mt-1.5 text-amber-200/70">Risk is below one contract — lower the stop, raise the risk, or use a micro contract.</p>
+                )}
               </div>
             </div>
           </div>
@@ -571,7 +603,8 @@ export default function RiskCalculator() {
                       <select aria-label={`${account.name} currency`} className={`${inputClass} calculator-select px-2`} value={account.currency} onChange={(event) => updateAccount(market, account.id, { currency: event.target.value as AccountCurrency })}>{ACCOUNT_CURRENCIES.map((currency) => <option key={currency}>{currency}</option>)}</select>
                       <div className="relative"><input aria-label={`${account.name} risk percent`} className={`${inputClass} px-3 pr-6`} type="number" min="0" step="0.1" value={account.riskPercent} onChange={(event) => updateAccount(market, account.id, { riskPercent: editableNumberValue(event.target.value) })} /><span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] text-white/35">%</span></div>
                     </div>
-                    <div className="mt-2 flex justify-end text-[9px] text-white/35">
+                    <div className="mt-2 flex justify-end gap-3 text-[9px] text-white/35">
+                      {positionSize === 0 && <span className="text-amber-200/70">Below minimum size</span>}
                       <span>Actual risk: {actualRisk === null ? "—" : formatMoney(actualRisk, account.currency)}</span>
                     </div>
                   </div>
@@ -581,6 +614,9 @@ export default function RiskCalculator() {
           </div>
         </div>
 
+        <p className={`mt-3 text-[9px] ${ratesFailed ? "text-red-300/80" : "text-white/30"}`}>
+          {ratesLabel(ratesMeta, ratesFailed)}
+        </p>
       </div>
     </section>
   );
