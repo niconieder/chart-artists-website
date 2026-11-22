@@ -4,7 +4,7 @@
 You are a professional website builder. Prioritize premium design, performance, UX, accessibility, and responsive layouts. Pay attention to details: spacing, typography, hover states, visual hierarchy, and consistent patterns.
 
 ## Project
-Next.js 15 + Tailwind CSS v4 landing page for "The Chart Artists" trading community.
+Next.js 16 + Tailwind CSS v4 landing page for "The Chart Artists" trading community.
 - Hosted on Vercel, domain: chartartists.com
 - Community platform: Whop — whop.com/chart-artists/
 - Twitter/X: @WelLdoOnEe
@@ -17,7 +17,7 @@ Next.js 15 + Tailwind CSS v4 landing page for "The Chart Artists" trading commun
 - No buzzwords, no scammy patterns
 
 ## Tech Stack
-- Next.js 15, React 19, TypeScript
+- Next.js 16, React 19, TypeScript
 - Tailwind CSS v4 with `@tailwindcss/postcss`
 - No external UI libraries — pure React + Tailwind, no shadcn/Radix
 - No JS animation libraries — CSS-only animations
