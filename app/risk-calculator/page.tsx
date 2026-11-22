@@ -6,6 +6,7 @@ import RiskCalculator from "@/components/RiskCalculator";
 export const metadata: Metadata = {
   title: "Forex & Futures Risk Calculator | The Chart Artists",
   description: "Calculate forex lot sizes and CME futures contracts for one or multiple trading accounts.",
+  alternates: { canonical: "/risk-calculator" },
 };
 
 export default function RiskCalculatorPage() {

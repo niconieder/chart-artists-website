@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 export const metadata: Metadata = {
   title: "Member Tools | The Chart Artists",
   description: "Trading tools for members of The Chart Artists.",
+  alternates: { canonical: "/tools" },
 };
 
 const tools = [

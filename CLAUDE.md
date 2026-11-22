@@ -35,7 +35,7 @@ Next.js 15 + Tailwind CSS v4 landing page for "The Chart Artists" trading commun
 ## CTAs & Links
 - All join buttons → Whop checkout URLs (per pricing tier)
 - Social links → X/Twitter
-- Trader count ("114+ traders") hardcoded in Hero + ClosingCTA — update both
+- Trader count ("114+ traders") hardcoded in Hero — update there
 
 ## Quality Standards
 - Mobile-first responsive: base → `sm:` → `md:` breakpoints

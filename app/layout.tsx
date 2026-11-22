@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "The Chart Artists",
     description: "Build your edge. No hype.",
-    url: "https://whop.com/chart-artists/",
+    url: "https://chartartists.com",
     siteName: "The Chart Artists",
     type: "website",
   },
