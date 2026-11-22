@@ -47,6 +47,10 @@ export default function FAQ() {
           {faqs.map(({ question, answer }, i) => (
             <div key={i} className="border-b border-white/10">
               <button
+                type="button"
+                id={`faq-question-${i}`}
+                aria-expanded={open === i}
+                aria-controls={`faq-answer-${i}`}
                 onClick={() => setOpen(open === i ? null : i)}
                 className="w-full flex items-center justify-between py-6 text-left group"
               >
@@ -54,6 +58,7 @@ export default function FAQ() {
                   {question}
                 </span>
                 <span
+                  aria-hidden
                   className="text-xl font-light shrink-0 transition-transform duration-300"
                   style={{
                     color: "#7D9E82",
@@ -64,6 +69,10 @@ export default function FAQ() {
                 </span>
               </button>
               <div
+                id={`faq-answer-${i}`}
+                role="region"
+                aria-labelledby={`faq-question-${i}`}
+                inert={open !== i}
                 className="overflow-hidden transition-all duration-300"
                 style={{
                   maxHeight: open === i ? "300px" : "0px",

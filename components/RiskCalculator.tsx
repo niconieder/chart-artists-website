@@ -437,6 +437,7 @@ export default function RiskCalculator() {
             <p className="hidden text-[10px] text-white/30 sm:block">Used for every account</p>
           </div>
           {market === "forex" ? (
+            <>
             <div className="grid gap-2.5 sm:grid-cols-[1fr_130px]">
               <label>
                 <FieldLabel>Currency pair</FieldLabel>
@@ -447,6 +448,20 @@ export default function RiskCalculator() {
                 <input aria-label="Stop loss in pips" className={inputClass} type="number" min="0.1" step="0.1" value={stopLoss} onChange={(event) => setStopLoss(editableNumberValue(event.target.value))} />
               </label>
             </div>
+            <div className="mt-2.5 border-t border-white/8 pt-2.5 text-[9px] text-white/35">
+              <div className="flex flex-wrap gap-x-4 gap-y-1">
+                <span>1 pip = {instrument.pipSize} price move</span>
+                {stopLoss !== "" && stopLoss > 0 && (
+                  <span>{stopLoss} pips = {Number((stopLoss * instrument.pipSize).toFixed(5))} price move</span>
+                )}
+              </div>
+              {instrument.category === "Metals" && (
+                <p className="mt-1.5 text-amber-200/70">
+                  Many brokers count 1 pip on {instrument.symbol} as {Number((instrument.pipSize * 10).toFixed(5))}. If yours does, enter 10× the pips here.
+                </p>
+              )}
+            </div>
+            </>
           ) : (
             <>
               <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-[1fr_120px_120px_200px]">

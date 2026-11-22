@@ -40,7 +40,7 @@ Next.js 15 + Tailwind CSS v4 landing page for "The Chart Artists" trading commun
 ## Quality Standards
 - Mobile-first responsive: base → `sm:` → `md:` breakpoints
 - Accessibility: `aria-hidden` on decorative elements, heading hierarchy, `rel="noopener noreferrer"` on external links
-- Performance: Next.js Image component, edge-optimized OG image, Google Fonts with subsets
+- Performance: Next.js Image component, statically generated OG image, Google Fonts with subsets
 - Smooth scroll enabled globally
 - Verify every change in browser (no test suite)
 

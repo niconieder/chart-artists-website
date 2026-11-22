@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   title: "Member Tools | The Chart Artists",
   description: "Trading tools for members of The Chart Artists.",
   alternates: { canonical: "/tools" },
+  robots: { index: false, follow: true },
 };
 
 const tools = [
